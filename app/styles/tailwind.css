@@ -3,4 +3,6 @@
  * https://tailwindcss.com/docs/v4-beta#css-first-configuration
  */
 
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
