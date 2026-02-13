@@ -1,9 +1,10 @@
-import {Suspense} from 'react';
+import {Suspense, useState, useEffect} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
   useOptimisticCart,
+  Money
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
@@ -24,19 +25,50 @@ export function Header({
   publicStoreDomain,
 }: HeaderProps) {
   const {shop, menu} = header;
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrollingUp, setIsScrollingUp] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const {type: asideType} = useAside();
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    root.style.setProperty('--announcement-height', isScrolled ? '0px' : '40px');
+    root.style.setProperty('--header-height', isScrolled ? '64px' : '80px');
+
+    const handleScroll = () => {
+      if (asideType !== 'closed') return;
+
+      const currentScrollY = window.scrollY;
+
+      setIsScrollingUp(currentScrollY < lastScrollY);
+      setLastScrollY(currentScrollY);
+
+      setIsScrolled(currentScrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY, isScrolled, asideType]);
+
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
-      </NavLink>
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
-    </header>
+    <>
+    <div
+      className={
+        `fixed w-full z-40 transition-transform duration-500 ease-in-out
+        ${ !isScrollingUp && isScrolled && asideType === 'closed' ? 'translate-y-[-full]' : 'translate-y-0' }
+      `}
+    >
+      {/* Announcement Bar */}
+      <div>
+        <div>
+          <p>Complimentary Shipping on Orders Above <Money data={{ amount: '750', currencyCode: 'ZAR'}} /></p>
+        </div>
+      </div>
+    </div>
+    </>
   );
 }
 
