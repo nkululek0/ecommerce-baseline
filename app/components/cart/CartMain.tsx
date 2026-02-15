@@ -1,9 +1,8 @@
 import {useOptimisticCart, type OptimisticCartLine} from '@shopify/hydrogen';
-import {Link} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
-import {useAside} from '~/components/Aside';
-import {CartLineItem, type CartLine} from '~/components/CartLineItem';
+import {CartLineItem, type CartLine} from '~/components/cart/CartLineItem';
 import {CartSummary} from './CartSummary';
+import { CartEmpty } from './CartEmpty';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -50,7 +49,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
 
   return (
-    <div className={className}>
+    <div className={`${ linesCount ? className : 'h-full w-auto overflow-y-auto' }` }>
       <CartEmpty hidden={linesCount} layout={layout} />
       <div className="cart-details">
         <p id="cart-lines" className="sr-only">
@@ -81,26 +80,4 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
       </div>
     </div>
   );
-}
-
-function CartEmpty({
-  hidden = false,
-}: {
-  hidden: boolean;
-  layout?: CartMainProps['layout'];
-}) {
-  const {close} = useAside();
-  return (
-    <div hidden={hidden}>
-      <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
-      </p>
-      <br />
-      <Link to="/collections" onClick={close} prefetch="viewport">
-        Continue shopping →
-      </Link>
-    </div>
-  );
-}
+};
