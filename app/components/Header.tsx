@@ -267,17 +267,12 @@ function HeaderCtas({
 }
 
 function HeaderMenuMobileToggle() {
-  const [isOpen, setIsOpen] = useState(false);
-  const { open, close } = useAside();
+  const {open} = useAside();
 
   return (
     <button
       className="p-2 -ml-2 hover:text-brand-gold transition-colors duration-200"
-      onClick={
-        isOpen
-        ? () => { close(); setIsOpen(false); }
-        : () => { open('mobile'); setIsOpen(true); }
-      }
+      onClick={() => { open('mobile'); }}
     >
       <Menu className="w-6 h-6" />
     </button>
@@ -285,17 +280,12 @@ function HeaderMenuMobileToggle() {
 }
 
 function SearchToggle() {
-  const [isOpen, setIsOpen] = useState(false);
-  const { open, close } = useAside();
+  const {open} = useAside();
 
   return (
     <button
       className="p-2 hover:text-brand-gold transition-colors duration-200 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-brand-gold after:transition-all after:duration-300 hover:after:w-full"
-      onClick={
-        isOpen
-        ? () =>  { close(); setIsOpen(false) }
-        : () =>  { open('search'); setIsOpen(true) }
-      }
+      onClick={ () => { open('search'); } }
     >
       <Search className='w-5 h-5' />
     </button>
@@ -303,8 +293,7 @@ function SearchToggle() {
 }
 
 function CartBadge({count}: {count: number | null}) {
-  const [isOpen, setIsOpen] = useState(false)
-  const { open, close } = useAside();
+  const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
 
   return (
@@ -312,20 +301,13 @@ function CartBadge({count}: {count: number | null}) {
     <button
       className="relative p-2 hover:text-brand-gold transition-colors duration-200 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-brand-gold after:transition-all after:duration-300 hover:after:w-full"
       onClick={() => {
-        if (isOpen) {
-          close();
-          setIsOpen(false);
-        }
-        else {
-          open("cart");
-          publish("cart_viewed", {
-            cart,
-            prevCart,
-            shop,
-            url: window.location.href || ''
-          });
-          setIsOpen(true);
-        }
+        open("cart");
+        publish("cart_viewed", {
+          cart,
+          prevCart,
+          shop,
+          url: window.location.href || ''
+        });
       }}
     >
       <ShoppingBag className='w-5 h-5' />
