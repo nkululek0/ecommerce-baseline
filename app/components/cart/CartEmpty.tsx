@@ -16,7 +16,7 @@ export function CartEmpty({
   return (
     <>
     <div
-      className={`h-full flex flex-col items-center justify-center text-center p-6`}
+      className={`flex flex-col items-center justify-center text-center p-6`}
     >
       {/* Icons */}
       <div className="relative mb-8">
