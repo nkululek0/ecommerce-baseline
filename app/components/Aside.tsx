@@ -96,7 +96,7 @@ export function Aside({
       >
         {/* Header */}
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="font-playfair text-xl text-brand-navy">
+          <h3 className="font-playFair text-xl text-brand-navy">
             { heading }
           </h3>
           <button

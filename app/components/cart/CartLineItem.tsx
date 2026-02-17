@@ -57,7 +57,7 @@ export function CartLineItem({
           onClick={ close }
           className='block'
         >
-          <h3 className="font-playfair text-base text-brand-navy mb-1 truncate">
+          <h3 className="font-playFair text-base text-brand-navy mb-1 truncate">
             { product.title }
           </h3>
         </Link>

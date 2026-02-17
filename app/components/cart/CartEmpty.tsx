@@ -28,7 +28,7 @@ export function CartEmpty({
 
       {/* Content */}
       <div className="max-w-md space-y-4">
-        <h2 className="font-playfair text-2xl text-brand-navy">
+        <h2 className="font-playFair text-2xl text-brand-navy">
           Your Shopping Cart is Empty
         </h2>
         <p className="font-source text-gray-500 leading-relaxed">
