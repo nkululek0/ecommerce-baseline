@@ -169,7 +169,6 @@ export function HeaderMenu({
                   : item.url;
 
                 return (
-                  <>
                   <NavLink
                     key={ item.id }
                     className={({isActive}) => `${ baseClassName } text-lg py-2 block ${ isActive ? 'text-brand-gold' : 'text-brand-navy' }`}
@@ -180,7 +179,6 @@ export function HeaderMenu({
                   >
                     { item.title }
                   </NavLink>
-                  </>
                 );
               })
             }
