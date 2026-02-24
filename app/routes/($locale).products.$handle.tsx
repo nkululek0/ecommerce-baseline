@@ -1,4 +1,6 @@
-import {redirect, useLoaderData} from 'react-router';
+import {Suspense} from 'react';
+import {redirect, useLoaderData, Await} from 'react-router';
+
 import type {Route} from './+types/products.$handle';
 import {
   getSelectedProductOptions,
@@ -30,7 +32,10 @@ export async function loader(args: Route.LoaderArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return {...deferredData, ...criticalData};
+  return {
+    ...criticalData,
+    variants: deferredData.variants,
+  };
 }
 
 /**
@@ -73,11 +78,18 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
   // Put any API calls that is not critical to be available on first page render
   // For example: product reviews, product recommendations, social feeds.
 
-  return {};
+  const {handle} = params;
+  const {storefront} = context;
+
+  return {
+    variants: storefront.query(PRODUCT_QUERY, {
+      variables: {handle, selectedOptions: []},
+    }),
+  };
 }
 
 export default function Product() {
-  const {product} = useLoaderData<typeof loader>();
+  const {product, variants} = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -95,10 +107,10 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title, descriptionHtml} = product;
+  const { title, descriptionHtml } = product;
 
   return (
-    <div className="pt-48 md:pt-48">
+    <div className="pt-48 pb-20 md:pt-48 md:pb-20">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Left side Images */}
@@ -113,6 +125,68 @@ export default function Product() {
               }))}
               selectedVariantImage={ selectedVariant.image }
             />
+          </div>
+
+          {/* Right side - Details & CTA */}
+          <div className="space-y-10">
+            {/* Product Title & Price */}
+            <div className="space-y-4 border-b border-brand-navy/10 pb-6">
+              <h1 className="font-playFair text-3xl md:text-4x1 lg:text-5xl text-brand-navy">
+                { title }
+              </h1>
+              <ProductPrice
+                price={ selectedVariant?.price }
+                compareAtPrice={ selectedVariant?.compareAtPrice }
+                className='font-source text-xl text-brand-navy'
+              />
+            </div>
+
+            {/* Product Form */}
+            <Suspense>
+              <Await resolve={ variants }>
+                {
+                  (data) => (
+                    <ProductForm
+                      product={ productOptions }
+                      selectedVariant={ selectedVariant }
+                      className='space-y-8'
+                    />
+                  )
+                }
+              </Await>
+            </Suspense>
+
+            {/* Product Description */}
+            <div className="mt-12 border-t border-brand-navy/10">
+              <div className="grid grid-cols-1 divide-y divide-brand-navy/10">
+                <details className="group py-6">
+                  <summary className="flex items-center justify-between cursor-pointer list-none">
+                    <h3 className="font-playFair text-lg text-brand-navy">Product Description</h3>
+                    <span className="relative flex-shrink-0 ml-4 w-4 h-4">
+                      <svg
+                        className='absolute inset-0 w-4 h-4 transition duration-300 group-open:rotate-180'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                        stroke='currentColor'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M19 9l-7 7-7-7'
+                        />
+                      </svg>
+                    </span>
+                  </summary>
+                  <div className="pt-4 prose font-source text-brand-navy/80">
+                    <div
+                      dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                    />
+                  </div>
+                </details>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -206,6 +280,11 @@ const PRODUCT_FRAGMENT = `#graphql
         altText
         width
         height
+      }
+    }
+    variants(first: 1) {
+      nodes {
+        ...ProductVariant
       }
     }
     selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
