@@ -744,6 +744,10 @@ export type PageQuery = {
       seo?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.Seo, 'description' | 'title'>
       >;
+      subtitle?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+      introText?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+      ctaContent?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+      ctaButton?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
     }
   >;
 };
@@ -1380,7 +1384,7 @@ interface GeneratedQueryTypes {
     return: CatalogQuery;
     variables: CatalogQueryVariables;
   };
-  '#graphql\n  query Page(\n    $language: LanguageCode,\n    $country: CountryCode,\n    $handle: String!\n  )\n  @inContext(language: $language, country: $country) {\n    page(handle: $handle) {\n      handle\n      id\n      title\n      body\n      seo {\n        description\n        title\n      }\n    }\n  }\n': {
+  '#graphql\n  query Page(\n    $language: LanguageCode,\n    $country: CountryCode,\n    $handle: String!\n  )\n  @inContext(language: $language, country: $country) {\n    page(handle: $handle) {\n      handle\n      id\n      title\n      body\n      seo {\n        description\n        title\n      }\n      subtitle: metafield (namespace: "custom", key: "subtitle") {\n        value\n      }\n      introText: metafield (namespace: "custom", key: "intro_text") {\n        value\n      }\n      ctaContent: metafield (namespace: "custom", key: "cta_content") {\n        value\n      }\n      ctaButton: metafield (namespace: "custom", key: "cta_button") {\n        value\n      }\n    }\n  }\n': {
     return: PageQuery;
     variables: PageQueryVariables;
   };

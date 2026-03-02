@@ -1,4 +1,4 @@
-import {useLoaderData} from 'react-router';
+import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
@@ -58,11 +58,74 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="page">
-      <header>
-        <h1>{page.title}</h1>
-      </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
+    <div className="min-h-screen pt-24 md:pt-31">
+      {/* Hero Section */}
+      <section className="bg-brand-navy py-24 px-4">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="font-playFair text-2xl md:text-3xl text-white mb-6">
+              { page.title }
+            </h1>
+            {
+              page.subtitle?.value && (
+                <div className="font-source text-lg text-brand-cream" dangerouslySetInnerHTML={{__html: page.subtitle.value}} />
+              )
+            }
+          </div>
+        </div>
+      </section>
+
+      {/* Page Section */}
+      <section className="pt-20 md:pt-28 px-4 bg-white">
+        <div className="container mx-auto">
+          <div className="max-w-3xl mx-auto">
+            <div className="max-w-none">
+              <div className="font-source text-brand-navy/80 text-lg md:text-xl leading-relaxed">
+                {
+                  page.introText?.value && (
+                    <div className="mb-16" dangerouslySetInnerHTML={{__html: page.introText.value}}/>
+                  )
+                }
+              </div>
+              <div
+                className="font-source text-brand-navy/80"
+                dangerouslySetInnerHTML={{
+                  __html: page.body
+                  .replaceAll(/<h2>/g, "<h2 class='font-playFair text-2xl text-brand-navy mt-16 mb-8'>")
+                  .replaceAll(/<h3>/g, "<h3 class='font-playFair text-xl text-brand-navy mt-12 mb-4'>")
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      {
+        page.ctaContent?.value && (
+          <section className="pt-8 pb-12 px-4 bg-white">
+            <div className="container mx-auto">
+              <div className="max-w-3xl mx-auto">
+                <div
+                  className="font-source text-brand-navy/80"
+                  dangerouslySetInnerHTML={{
+                    __html: page.ctaContent.value
+                    .replaceAll(/<h2>/g, "<h2 class='font-playFair text-2xl text-brand-navy mt-16 mb-8'>")
+                    .replaceAll(/<h3>/g, "<h3 class='font-playFair text-xl text-brand-navy mt-12 mb-4'>")
+                  }}
+                />
+                <Link
+                  to='/contact'
+                  prefetch='intent'
+                  className='inline-flex items-center px-8 py-4 mt-8 bg-brand-navy text-white hover:bg-brand-navyLight transition-colors duration-300 font-source tracking-wide'
+                >
+                  { page.ctaButton?.value }
+                </Link>
+              </div>
+            </div>
+          </section>
+        )
+      }
     </div>
   );
 }
@@ -82,6 +145,18 @@ const PAGE_QUERY = `#graphql
       seo {
         description
         title
+      }
+      subtitle: metafield (namespace: "custom", key: "subtitle") {
+        value
+      }
+      introText: metafield (namespace: "custom", key: "intro_text") {
+        value
+      }
+      ctaContent: metafield (namespace: "custom", key: "cta_content") {
+        value
+      }
+      ctaButton: metafield (namespace: "custom", key: "cta_button") {
+        value
       }
     }
   }
