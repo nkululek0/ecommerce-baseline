@@ -51,21 +51,73 @@ export default function Collection() {
   const {products} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collection">
-      <h1>Products</h1>
-      <PaginatedResourceSection<CollectionItemFragment>
-        connection={products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
-    </div>
+    <>
+    {/* Hero Section */}
+    <section className="relative h-[80vh] min-h-[600px] bg-brand-navy">
+      <div className="absolute inset-0">
+        <Image
+          data={{
+            url: '/images/craftsman-in-shop.jpg',
+            width: 1920,
+            height: 1000
+          }}
+          alt='Craftsmanship'
+          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 22vw'
+          loading='eager'
+          className='absolute inset-0 w-full h-full object-cover opacity-70'
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/50 to-brand-navy/80" />
+      <div className="relative container mx-auto px-4 h-full flex items-center">
+        <div className="max-w-2xl">
+          <h1 className="font-playFair text-4xl md:text-6xl text-white mb-6">Artisanal Excellence</h1>
+          <p className="font-source text-leg text-gray-200 mb-8 max-w-xl">Where time-honored techniques meet contemporary sophistication.</p>
+        </div>
+      </div>
+    </section>
+
+    {/* Collection Section */}
+    <section className="bg-brand-cream border-y border-brand-navy/10">
+      <div className="container mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-8 px-4 gap-4">
+          <div className='space-y-2'>
+            <h2 className='font-playFair text-2xl text-brand-navy'>
+              The Collection
+            </h2>
+            <p className='font-source text-brand-navy/60'>
+              Showing { products.nodes.length } products
+            </p>
+          </div>
+          <div className='flex items-center gap-6'>
+            <button className='font-source text-sm text-brand-navy/60 hover:text-brand-navy transition-color'>
+              Filter
+            </button>
+            <button className='font-source text-sm text-brand-navy/60 hover:text-brand-navy transition-color'>
+              Sort
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* Products Grid */}
+    <section className="bg-white py-16 md:py-24">
+      <div className="container mx-auto px-4">
+        <PaginatedResourceSection<CollectionItemFragment>
+          connection={products}
+          resourcesClassName="grid grid-cols-1 md:grid-cols2 lg:grid-cols-3 gap-16"
+        >
+          {({node: product, index}) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              loading={index < 8 ? 'eager' : undefined}
+            />
+          )}
+        </PaginatedResourceSection>
+      </div>
+    </section>
+    </>
   );
 }
 
