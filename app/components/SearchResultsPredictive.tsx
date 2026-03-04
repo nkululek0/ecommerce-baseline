@@ -203,10 +203,11 @@ function SearchResultsPredictiveProducts({
   if (!products.length) return null;
 
   return (
-    <div className="predictive-search-result" key="products">
+    <>
+    <div className="mb-5" key="products">
       <h5>Products</h5>
-      <ul>
-        {products.map((product) => {
+      <ul className="mt-2">
+        {products.map((product, index) => {
           const productUrl = urlWithTrackingParams({
             baseUrl: `/products/${product.handle}`,
             trackingParams: product.trackingParameters,
@@ -215,20 +216,35 @@ function SearchResultsPredictiveProducts({
 
           const price = product?.selectedOrFirstAvailableVariant?.price;
           const image = product?.selectedOrFirstAvailableVariant?.image;
+          const productsLength = products.length;
+
           return (
-            <li className="predictive-search-result-item" key={product.id}>
-              <Link to={productUrl} onClick={closeSearch}>
-                {image && (
-                  <Image
-                    alt={image.altText ?? ''}
-                    src={image.url}
-                    width={50}
-                    height={50}
-                  />
-                )}
+            <li
+              key={product.id}
+              className={`pb-3 border-b border-gray-10 ${ index < productsLength - 1 ? 'mb-6' : 'mb-0' }`}
+            >
+              <Link
+                to={productUrl}
+                onClick={closeSearch}
+                className='flex gap-4 border-b border-gray-100'
+              >
+                <div className='relative w-24 h-24 bg-gray-50 rounded-lg overflow-hidden'>
+                  {
+                    image && (
+                      <Image
+                        src={image.url}
+                        alt={image.altText ?? ''}
+                        aspectRatio='1/1'
+                        className='object-cover w-full h-full'
+                        loading='lazy'
+                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                      />
+                    )
+                  }
+                </div>
                 <div>
-                  <p>{product.title}</p>
-                  <small>{price && <Money data={price} />}</small>
+                  <p className='font-playFair text-base text-brand-navy mb-1 truncate'>{product.title}</p>
+                  <small className='font-source font-medium'>{price && <Money data={price} />}</small>
                 </div>
               </Link>
             </li>
@@ -236,6 +252,7 @@ function SearchResultsPredictiveProducts({
         })}
       </ul>
     </div>
+    </>
   );
 }
 

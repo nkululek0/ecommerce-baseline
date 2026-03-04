@@ -102,11 +102,11 @@ function SearchResultsProducts({
   }
 
   return (
-    <div className="search-result">
-      <h2>Products</h2>
+    <div className="">
+      <h2 className='mb-2'>Products</h2>
       <Pagination connection={products}>
         {({nodes, isLoading, NextLink, PreviousLink}) => {
-          const ItemsMarkup = nodes.map((product) => {
+          const ItemsMarkup = nodes.map((product, index) => {
             const productUrl = urlWithTrackingParams({
               baseUrl: `/products/${product.handle}`,
               trackingParams: product.trackingParameters,
@@ -115,16 +115,33 @@ function SearchResultsProducts({
 
             const price = product?.selectedOrFirstAvailableVariant?.price;
             const image = product?.selectedOrFirstAvailableVariant?.image;
+            const productsLength = nodes.length;
 
             return (
-              <div className="search-results-item" key={product.id}>
-                <Link prefetch="intent" to={productUrl}>
-                  {image && (
-                    <Image data={image} alt={product.title} width={50} />
-                  )}
+              <div
+                key={product.id}
+                className={`${ index < productsLength - 1 ? 'mb-6' : 'mb-0' }`}
+              >
+                <Link
+                  prefetch="intent"
+                  to={productUrl}
+                  className='flex gap-4'
+                >
+                  <div className='relative w-24 h-24 bg-gray-50 rounded-lg overflow-hidden'>
+                    {image && (
+                      <Image
+                        data={image}
+                        alt={product.title}
+                        aspectRatio='1/1'
+                        className='object-cover w-full h-full'
+                        loading='lazy'
+                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                      />
+                    )}
+                  </div>
                   <div>
-                    <p>{product.title}</p>
-                    <small>{price && <Money data={price} />}</small>
+                    <p className='font-playFair text-base text-brand-navy mb-1 truncate'>{product.title}</p>
+                    <small className='font-source font-medium'>{price && <Money data={price} />}</small>
                   </div>
                 </Link>
               </div>
@@ -140,7 +157,6 @@ function SearchResultsProducts({
               </div>
               <div>
                 {ItemsMarkup}
-                <br />
               </div>
               <div>
                 <NextLink>
