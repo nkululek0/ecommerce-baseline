@@ -173,5 +173,5 @@ function SearchResultsProducts({
 }
 
 function SearchResultsEmpty() {
-  return <p>No results, try a different search.</p>;
+  return <p className='font-source medium mb-5 text-center'>No results, try a different search.</p>;
 }
