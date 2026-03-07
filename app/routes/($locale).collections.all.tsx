@@ -1,5 +1,5 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData} from 'react-router';
+import {useLoaderData, Link} from 'react-router';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
@@ -23,19 +23,20 @@ export async function loader(args: Route.LoaderArgs) {
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
-async function loadCriticalData({context, request}: Route.LoaderArgs) {
+async function loadCriticalData({context, request }: Route.LoaderArgs) {
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
 
-  const [{products}] = await Promise.all([
+  const [{products, collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
       variables: {...paginationVariables},
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
-  return {products};
+
+  return { products, collections };
 }
 
 /**
@@ -48,7 +49,8 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Collection() {
-  const {products} = useLoaderData<typeof loader>();
+  const { products, collections } = useLoaderData<typeof loader>();
+  console.log(collections);
 
   return (
     <>
@@ -85,36 +87,77 @@ export default function Collection() {
               The Collection
             </h2>
             <p className='font-source text-brand-navy/60'>
-              Showing { products.nodes.length } products
+              {
+                collections.nodes.length <= 2 && (
+                  'Showing 1 category'
+                )
+              }
+              {
+                collections.nodes.length >= 3 && (
+                  `Showing ${ collections.nodes.length - 1 } categories`
+                )
+              }
             </p>
-          </div>
-          <div className='flex items-center gap-6'>
-            <button className='font-source text-sm text-brand-navy/60 hover:text-brand-navy transition-color'>
-              Filter
-            </button>
-            <button className='font-source text-sm text-brand-navy/60 hover:text-brand-navy transition-color'>
-              Sort
-            </button>
           </div>
         </div>
       </div>
     </section>
 
     {/* Products Grid */}
-    <section className="bg-white py-16 md:py-24">
+    <section className="bg-white py-8 md:py-12">
       <div className="container mx-auto px-4">
-        <PaginatedResourceSection<CollectionItemFragment>
-          connection={products}
-          resourcesClassName="grid grid-cols-1 md:grid-cols2 lg:grid-cols-3 gap-16"
-        >
-          {({node: product, index}) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              loading={index < 8 ? 'eager' : undefined}
-            />
-          )}
-        </PaginatedResourceSection>
+        <div className="container mx-auto">
+          <h2 className="font-playFair text-3xl text-center mb-12">Our Popular Categories</h2>
+        </div>
+        <section className='grid grid-cols-1 md:grid-cols2 lg:grid-cols-3 gap-16'>
+          {
+            collections.nodes.map((item, index) => {
+              if (index > 0) {
+                return (
+                  <>
+                  <Link
+                    key={ index }
+                    prefetch='intent'
+                    to={`/collections/${ item.handle }`}
+                    className="group block relative"
+                  >
+                    {/* Image Container with hover effects */}
+                    <div className="relative aspect-square overflow-hidden bg-brand-cream mb-2">
+                      {
+                        item.image && (
+                          <>
+                            <Image
+                              alt={ item.image.altText || item.title }
+                              data={ item.image }
+                              loading='lazy'
+                              sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                              className="w-full h-full object-cover"
+                            />
+                            {/* Overlay on hover */}
+                            <div className="absolute inset-0 bg-brand-navy/0 group-hover:bg-brand-navy/20 transition-colors duration-500" />
+                          </>
+                        )
+                      }
+                      {/* Corner Accents */}
+                      <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    </div>
+
+                    {/* Product Information */}
+                    <div className="relative">
+                      <h4
+                        className='font-playFair text-lg text-brand-navy group-hover:text-brand-gold transition-color duration-500'
+                      >
+                        { item.title }
+                      </h4>
+                    </div>
+                  </Link>
+                  </>
+                );
+              }
+            })
+          }
+        </section>
       </div>
     </section>
     </>
@@ -158,7 +201,37 @@ const CATALOG_QUERY = `#graphql
     $startCursor: String
     $endCursor: String
   ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+    collections(
+      first: $first,
+      last: $last,
+      before: $startCursor,
+      after: $endCursor,
+    ) {
+      nodes {
+        id
+        handle
+        title
+        image {
+          url
+          id
+          altText
+          width
+          height
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+    }
+    products(
+      first: $first,
+      last: $last,
+      before: $startCursor,
+      after: $endCursor,
+    ) {
       nodes {
         ...CollectionItem
       }
