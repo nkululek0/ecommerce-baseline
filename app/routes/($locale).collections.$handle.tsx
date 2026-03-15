@@ -4,11 +4,92 @@ import {getPaginationVariables, Analytics, Image} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
-import { SortProducts } from '~/components/SortProducts';
+import { SortAndFilterProducts } from '~/components/SortAndFilterProducts';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
+};
+
+/**
+ * Has all filter keys that will
+ * be used for structuring the state of filters used in the search
+ * of the page url
+ */
+
+type FilterKeysAndValueObj = {
+  [key: string]: string | undefined | null
+  available?: "all" | "true" | "false"
+  price_lt?: string
+  price_gt?: string
+};
+
+const FilterKeysAndValueObjHelper = {
+  available: "true",
+  price_lt: "",
+  price_gt: ""
+} satisfies FilterKeysAndValueObj;
+
+const getFilterKeysAndValueObj = (url: URL): FilterKeysAndValueObj => {
+  const filterKeysAndValueObj: FilterKeysAndValueObj = {};
+  const keys = Object.keys(FilterKeysAndValueObjHelper);
+
+  for (const key of keys) {
+    filterKeysAndValueObj[key] = url.searchParams.get(`filter.${ key }`);
+  }
+
+  return filterKeysAndValueObj;
+};
+
+type CollectionProductsFilter = {
+  available?: boolean
+  price?: {
+    max?: number
+    min?: number
+  }
+};
+
+const getFilter = (filterSearchParams: FilterKeysAndValueObj): CollectionProductsFilter => {
+  const result: CollectionProductsFilter = {};
+
+  if (filterSearchParams['available'] && filterSearchParams['available'] != "all") {
+    result.available = filterSearchParams['available'] == "true";
+  }
+  if (filterSearchParams['price_gt']) {
+    console.log("filter has price_gt");
+    if (!result.price) {
+      result.price = {};
+    }
+    result.price.min = Number(filterSearchParams['price_gt']);
+  }
+  if (filterSearchParams['price_lt']) {
+    console.log("filter has price_lt")
+    if (!result.price) {
+      result.price = {};
+    }
+    result.price.max = Number(filterSearchParams['price_lt']);
+  }
+
+  return result;
+};
+
+type CollectionProductsSorting = {
+  reverse: boolean
+  sortKey: string
+};
+
+const getSorting = (url: URL): CollectionProductsSorting => {
+  const reverseSearchParam = url.searchParams.get("reverse");
+  let castedReverseSearchParam;
+
+  if (reverseSearchParam) {
+    castedReverseSearchParam = reverseSearchParam == "true";
+  }
+
+  return {
+    reverse: castedReverseSearchParam || false,
+    sortKey: url.searchParams.get("sortKey") || 'ID'
+  };
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -37,21 +118,14 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   }
 
   const url = new URL(request.url);
-  const reverseSearchParam = url.searchParams.get("reverse");
-  let castedReverseSearchParam;
 
-  if (reverseSearchParam) {
-    castedReverseSearchParam = reverseSearchParam == "true";
-  }
-
-  const sortVariables = {
-    reverse: castedReverseSearchParam || false,
-    sortKey: url.searchParams.get("sortKey") || 'ID'
-  };
+  const filterSearchParams = getFilterKeysAndValueObj(url);
+  const filterVariables = getFilter(filterSearchParams);
+  const sortVariables = getSorting(url);
 
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables, ...sortVariables},
+      variables: { handle, ...paginationVariables, ...sortVariables, filters: filterVariables },
       // Add other queries here, so that they are loaded in parallel
     }),
   ]);
@@ -67,7 +141,9 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   return {
     collection,
-    url
+    url,
+    filterSearchParams,
+    sortVariables
   };
 }
 
@@ -81,7 +157,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Collection() {
-  const { collection, url } = useLoaderData<typeof loader>();
+  const { collection, url, filterSearchParams, sortVariables } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -117,10 +193,11 @@ export default function Collection() {
     {/* Products Grid */}
     <section className="bg-white py-8 md:py-12">
       <div className='w-full container mx-auto mb-4 px-4 flex items-center justify-between gap-6'>
-        <button className='font-source text-sm text-brand-navy/60 hover:text-brand-navy transition-color'>
-          Filter:
-        </button>
-        <SortProducts url={ url } />
+        <SortAndFilterProducts
+          url={ url }
+          filtering={ filterSearchParams }
+          sorting={ sortVariables }
+        />
       </div>
       <div className="container mx-auto px-4">
         <PaginatedResourceSection<ProductItemFragment>
@@ -189,6 +266,7 @@ const COLLECTION_QUERY = `#graphql
     $endCursor: String
     $reverse: Boolean
     $sortKey: ProductCollectionSortKeys
+    $filters: [ProductFilter!]
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
@@ -202,6 +280,7 @@ const COLLECTION_QUERY = `#graphql
         after: $endCursor,
         reverse: $reverse,
         sortKey: $sortKey
+        filters: $filters
       ) {
         nodes {
           ...ProductItem

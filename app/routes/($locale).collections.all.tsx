@@ -49,8 +49,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Collection() {
-  const { products, collections } = useLoaderData<typeof loader>();
-  console.log(collections);
+  const { collections } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -84,7 +83,7 @@ export default function Collection() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-8 px-4 gap-4">
           <div className='space-y-2'>
             <h2 className='font-playFair text-2xl text-brand-navy'>
-              The Collection
+              The Catalog
             </h2>
             <p className='font-source text-brand-navy/60'>
               {
