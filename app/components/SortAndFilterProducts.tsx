@@ -117,15 +117,20 @@ type SortAndFilterProductsProps = {
   url: URL
   filtering: ProductsFilter
   sorting: ProductSorting
+  currency: string
 };
 
 export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
-  const { url, filtering, sorting } = props;
+  const { url, filtering, sorting, currency } = props;
   const currentSearchParam = useRef<ProductsFilter & ProductSorting>({...filtering, ...sorting});
   const currentSearchParamString = useRef(getSearchParam(currentSearchParam.current));
   const [selectedFilterAvailability, setSelectedFilterAvailability] = useState("");
+  const filterPricingInputs = { minPrice: useRef<HTMLInputElement>(null), maxPrice: useRef<HTMLInputElement>(null) };
   const [appliedFilters, setAppliedFilters] = useState<Array<string>>([]);
   const navigate = useNavigate();
+  const applySearchParam = () => {
+    navigate(currentSearchParamString.current, { replace: true, preventScrollReset: true });
+  };
 
   const handleSetSearchParam = (paramKey: string, paramValue: string | boolean) => {
     currentSearchParam.current[paramKey] = paramValue;
@@ -142,6 +147,9 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
       }
       else currentSearchParam.current[key] = "";
     }
+
+    if (filterPricingInputs.minPrice.current?.value) filterPricingInputs.minPrice.current.value = "";
+    if (filterPricingInputs.maxPrice.current?.value) filterPricingInputs.maxPrice.current.value = "";
 
     setAppliedFilters([]);
     currentSearchParamString.current = getSearchParam(currentSearchParam.current);
@@ -177,7 +185,7 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
         }}
       >
         <p className="flex items-center justify-center gap-1 px-3 py-1 border border-1 border-[#000] transition duration-300">
-          <span data-active-filter-value>
+          <span>
             {
               appliedFilters.length == 0 && (
                 'None'
@@ -198,10 +206,10 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
         </p>
         <div
           data-filter-main
-          className='z-10 hidden absolute grid grid-cols-1 divide-y divide-brand-navy/10 w-full p-[1rem] bg-white'
+          className='z-10 hidden absolute w-[400px] grid grid-cols-1 divide-y divide-brand-navy/10 p-[1rem] bg-white'
         >
           <details
-            className="group"
+            className="group mb-2"
             onClick={(event) => {
               event.stopPropagation();
             }}
@@ -228,7 +236,7 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
 
                         return currentValue;
                       })
-                      navigate(currentSearchParamString.current, { replace: true, preventScrollReset: true });
+                      applySearchParam();
                     }}
                     className={`w-full flex items-center gap-1 py-0.5`}
                   >
@@ -246,6 +254,78 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
               }
             </div>
           </details>
+          <details
+            className="group w-full"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <summary className="flex items-center gap-1 cursor-pointer list-none my-2">
+              <p className='py-1'>Price</p>
+              <ChevronDown data-filter-price-dropdown-arrow className="w-4 h-4 transition duration-300 group-open:rotate-180" />
+            </summary>
+            <form
+              className='w-full'
+              onSubmit={(event) => {
+                event.preventDefault();
+
+                const minPrice = filterPricingInputs.minPrice.current?.value || "";
+                const maxPrice = filterPricingInputs.maxPrice.current?.value || "";
+
+                handleSetSearchParam("price_gt", minPrice);
+                handleSetSearchParam("price_lt", maxPrice);
+                setAppliedFilters((current) => {
+                  const currentValue = [...current];
+
+                  if (minPrice == "" && maxPrice == "") {
+                    return currentValue.filter((item) => item != "price");
+                  }
+                  else if (!currentValue.includes("price")) {
+                    currentValue.push("price");
+                  }
+
+                  return currentValue;
+                });
+                handleFilterListToggle();
+                applySearchParam();
+              }}
+            >
+              <div className="flex items-center gap-4 w-full mb-2">
+                <div className='flex items-center gap-1 w-[50%]'>
+                  <label>{ currency }:</label>
+                  <input
+                    ref={ filterPricingInputs.minPrice }
+                    defaultValue={ currentSearchParam.current.price_gt }
+                    type="number"
+                    placeholder="Min"
+                    className="w-[80%] px-2 py-1 border border-1 border-gray"
+                    onClick={(event) => {
+                      event.preventDefault();
+                    }}
+                  />
+                </div>
+                <div className='flex items-center gap-1 w-[50%]'>
+                  <label>{ currency }:</label>
+                  <input
+                    ref={ filterPricingInputs.maxPrice }
+                    defaultValue={ currentSearchParam.current.price_lt }
+                    type="number"
+                    placeholder="Max"
+                    className="w-[80%] px-2 py-1 border border-1 border-gray"
+                    onClick={(event) => {
+                      event.preventDefault();
+                    }}
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                className='w-full py-2.5 mt-1 text-white font-source text-base tracking-wider bg-brand-navy hover:bg-brand-navyLight'
+              >
+                Apply
+              </button>
+            </form>
+          </details>
         </div>
       </div>
       {
@@ -254,7 +334,7 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
             className="pt-1.5 font-source text-sm text-brand-navy/60 duration-300 transition-colors hover:text-brand-navy cursor-pointer"
             onClick={() => {
               resetFilterSearchParam();
-              navigate(currentSearchParamString.current, { replace: true, preventScrollReset: true });
+              applySearchParam();
             }}
           >
             clear filters
@@ -301,7 +381,7 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
                     onClick={() => {
                       handleSetSearchParam("sortKey", sortKey);
                       handleSetSearchParam("reverse", reverse == "true");
-                      navigate(currentSearchParamString.current, { replace: true, preventScrollReset: true });
+                      applySearchParam();
                     }}
                     className="block px-3 py-1 w-full border border-1 border-transparent hover:border-brand-gold hover:text-brand-gold"
                   >

@@ -18,7 +18,7 @@ export const meta: Route.MetaFunction = ({data}) => {
  */
 
 type FilterKeysAndValueObj = {
-  [key: string]: string | undefined | null
+  [key: string]: string | undefined
   available?: "all" | "true" | "false"
   price_lt?: string
   price_gt?: string
@@ -35,7 +35,7 @@ const getFilterKeysAndValueObj = (url: URL): FilterKeysAndValueObj => {
   const keys = Object.keys(FilterKeysAndValueObjHelper);
 
   for (const key of keys) {
-    filterKeysAndValueObj[key] = url.searchParams.get(`filter.${ key }`);
+    filterKeysAndValueObj[key] = url.searchParams.get(`filter.${ key }`) as string;
   }
 
   return filterKeysAndValueObj;
@@ -49,25 +49,20 @@ type CollectionProductsFilter = {
   }
 };
 
-const getFilter = (filterSearchParams: FilterKeysAndValueObj): CollectionProductsFilter => {
-  const result: CollectionProductsFilter = {};
+const getFilter = (filterSearchParams: FilterKeysAndValueObj): Array<CollectionProductsFilter> => {
+  const result: Array<CollectionProductsFilter> = [];
 
   if (filterSearchParams['available'] && filterSearchParams['available'] != "all") {
-    result.available = filterSearchParams['available'] == "true";
+    const value = { available: (filterSearchParams['available'] == "true") };
+    result.push(value);
   }
   if (filterSearchParams['price_gt']) {
-    console.log("filter has price_gt");
-    if (!result.price) {
-      result.price = {};
-    }
-    result.price.min = Number(filterSearchParams['price_gt']);
+    const value = { price: { min: Number(filterSearchParams['price_gt']) } };
+    result.push(value);
   }
   if (filterSearchParams['price_lt']) {
-    console.log("filter has price_lt")
-    if (!result.price) {
-      result.price = {};
-    }
-    result.price.max = Number(filterSearchParams['price_lt']);
+    const value = { price: { max: Number(filterSearchParams['price_lt']) } };
+    result.push(value);
   }
 
   return result;
@@ -143,7 +138,8 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     collection,
     url,
     filterSearchParams,
-    sortVariables
+    sortVariables,
+    currencyCode: collection.products.nodes[0].priceRange.minVariantPrice.currencyCode
   };
 }
 
@@ -157,7 +153,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Collection() {
-  const { collection, url, filterSearchParams, sortVariables } = useLoaderData<typeof loader>();
+  const { collection, url, filterSearchParams, sortVariables, currencyCode } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -197,6 +193,7 @@ export default function Collection() {
           url={ url }
           filtering={ filterSearchParams }
           sorting={ sortVariables }
+          currency={ currencyCode }
         />
       </div>
       <div className="container mx-auto px-4">
