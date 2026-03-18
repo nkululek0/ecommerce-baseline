@@ -188,7 +188,7 @@ export default function Collection() {
 
     {/* Products Grid */}
     <section className="bg-white py-8 md:py-12">
-      <div className='w-full container mx-auto mb-4 px-4 flex items-center justify-between gap-6'>
+      <div className='w-full container mx-auto mb-4 px-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center'>
         <SortAndFilterProducts
           url={ url }
           filtering={ filterSearchParams }

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {Link} from 'react-router';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
@@ -6,7 +7,8 @@ import type {
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
+import { Modal } from './Modal';
 
 export function ProductItem({
   product,
@@ -22,8 +24,10 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
+  const [openModal, setOpenModal] = useState(false);
 
   return (
+    <>
     <Link
       className="group block relative"
       key={product.id}
@@ -45,8 +49,15 @@ export function ProductItem({
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-brand-navy/0 group-hover:bg-brand-navy/20 transition-colors duration-500" />
 
-              {/* Quic view button */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+              {/* Quick view button */}
+              <div
+                className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setOpenModal(true);
+                }}
+              >
                 <div className="bg-white/90 backdrop-blur-sm py-3 px-4 text-center">
                   <span className="font-source text-sm font-medium text-brand-navy tracking-wide">
                     View Details
@@ -84,5 +95,20 @@ export function ProductItem({
         </div>
       </div>
     </Link>
+    <Modal
+      open={ openModal }
+      closeModal={() => {
+        setOpenModal(false);
+      }}
+      content={
+        <iframe
+          src={ variantUrl }
+          allowFullScreen
+          width="100%"
+          height="100%"
+        />
+      }
+    />
+    </>
   );
 }

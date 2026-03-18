@@ -30,6 +30,12 @@ export default {
 
       const response = await handleRequest(request);
 
+      // To allow for iframes/other sandbox content
+      response.headers.set(
+        "Content-Security-Policy",
+        "frame-ancestors 'self'"
+      );
+
       if (hydrogenContext.session.isPending) {
         response.headers.set(
           'Set-Cookie',

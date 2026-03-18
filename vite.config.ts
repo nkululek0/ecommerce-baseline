@@ -32,7 +32,7 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ['.tryhydrogen.dev', 'cdn.jsdelivr.net', '.ngrok-free.app'],
+    allowedHosts: ['.tryhydrogen.dev', 'cdn.jsdelivr.net', '.ngrok-free.app', '.youtube.com'],
     host: '0.0.0.0',
   },
 });
