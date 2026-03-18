@@ -206,7 +206,7 @@ export function SortAndFilterProducts (props: SortAndFilterProductsProps) {
         </p>
         <div
           data-filter-main
-          className='z-10 hidden absolute w-[400px] grid grid-cols-1 divide-y divide-brand-navy/10 p-[1rem] bg-white'
+          className='z-10 hidden absolute w-[82vw] md:w-[400px] grid grid-cols-1 divide-y divide-brand-navy/10 p-[1rem] bg-white'
         >
           <details
             className="group mb-2"
