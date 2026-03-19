@@ -21,9 +21,9 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
     <>
     <div className="bg-white px-6 py-8">
       {/* Subtotal */}
-      <div className="flex-items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4">
         <span className="font-source text-gray-600">
-          Subtotal
+          Subtotal:
         </span>
         <span className="font-source font-medium">
           {
@@ -44,7 +44,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       <CartGiftCards giftCardCodes={ cart.appliedGiftCards } />
 
       {/* Extra Information */}
-      <div className="mt-8 space-y-4">
+      <div className="mt-4 space-y-4">
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Gift className='w-4 h-4' />
           <span>Complimentary gift wrapping available</span>
@@ -54,6 +54,9 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           <span>Secure checkout</span>
         </div>
       </div>
+
+      {/* Checkout Button */}
+      <CartCheckoutActions checkoutUrl={ cart.checkoutUrl } />
     </div>
     </>
   );
@@ -63,8 +66,12 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
+    <div className='leading-[0] mt-6'>
+      <a
+        href={checkoutUrl}
+        target="_self"
+        className='block py-6 px-4 text-center cursor-pointer text-white font-source tracking-wider transition-all duration-300 ease-in-out bg-brand-navy hover:bg-brand-navyLight'
+      >
         <p>Continue to Checkout &rarr;</p>
       </a>
       <br />
