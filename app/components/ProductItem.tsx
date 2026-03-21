@@ -7,13 +7,15 @@ import type {
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Modal } from './Modal';
+import { Product } from './Product';
+import { getServerSideProps } from '~/../client';
 
 export function ProductItem({
   product,
   loading,
-  hidePrice
+  hidePrice,
 }: {
   product:
     | CollectionItemFragment
@@ -25,6 +27,7 @@ export function ProductItem({
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
   const [openModal, setOpenModal] = useState(false);
+  const [modalDetails, setModalDetails] = useState<{ product: any }>({ product: null });
 
   return (
     <>
@@ -52,10 +55,28 @@ export function ProductItem({
               {/* Quick view button */}
               <div
                 className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"
-                onClick={(event) => {
+                onClick={async (event) => {
                   event.preventDefault();
                   event.stopPropagation();
                   setOpenModal(true);
+
+                  const productVariantCountProps = await getServerSideProps(getProductVariantQueryString(product.handle)) as any;
+
+                  if (!productVariantCountProps.props.data) {
+                    console.error("Failed to fetch product variant count, please retry");
+
+                    return null;
+                  }
+
+                  const variantCount = productVariantCountProps.props.data.product.variantsCount.count;
+
+                  const productVariantProps = await getServerSideProps(getProductQueryString(product.handle, variantCount)) as any;
+
+                  if (productVariantProps.props.data) {
+                    const productVariant = productVariantProps.props.data.product;
+
+                    setModalDetails({ product: productVariant });
+                  }
                 }}
               >
                 <div className="bg-white/90 backdrop-blur-sm py-3 px-4 text-center">
@@ -100,15 +121,130 @@ export function ProductItem({
       closeModal={() => {
         setOpenModal(false);
       }}
-      content={
-        <iframe
-          src={ variantUrl }
-          allowFullScreen
-          width="100%"
-          height="100%"
-        />
-      }
-    />
+    >
+      <section style={{ width: '100%', height: '100%' }}>
+        {
+          modalDetails.product && (
+            <>
+            {
+              <Product
+                product={ modalDetails.product }
+                hideAdditionalInfo={ true }
+                isFullPage={ false }
+              />
+            }
+            </>
+          )
+        }
+      </section>
+    </Modal>
     </>
   );
 }
+
+const getProductQueryString = (productHandle: string, variantCount: number): string => {
+  return `#graphql
+    query Product(
+      $handle: String = "${ productHandle }",
+      $variantCount: Int = ${ variantCount }
+      ) {
+      product(handle: $handle) {
+        images(first: 10) {
+          nodes {
+            url
+            id
+            altText
+            height
+            width
+          }
+        }
+        id
+        title
+        selectedOrFirstAvailableVariant {
+          product {
+            handle
+            title
+          }
+          price {
+            amount
+            currencyCode
+          }
+          id
+          availableForSale
+          compareAtPrice {
+            amount
+            currencyCode
+          }
+          sku
+          title
+        }
+        variantsCount {
+          count
+        }
+        variants(first: $variantCount) {
+          nodes {
+            ...ProductVariant
+          }
+        }
+        adjacentVariants {
+          ...ProductVariant
+        }
+      }
+    }
+    ${PRODUCT_VARIANT_FRAGMENT}
+  `;
+};
+
+const getProductVariantQueryString = (productHandle: string): string => {
+  return `#graphql
+    query Product(
+      $handle: String = "${ productHandle }",
+    ) {
+      product(handle: $handle) {
+        variantsCount {
+          count
+        }
+      }
+    }
+  `;
+};
+
+const PRODUCT_VARIANT_FRAGMENT = `#graphql
+  fragment ProductVariant on ProductVariant {
+    availableForSale
+    compareAtPrice {
+      amount
+      currencyCode
+    }
+    id
+    image {
+      altText
+      height
+      id
+      url
+      width
+    }
+    price {
+      amount
+      currencyCode
+    }
+    priceV2 {
+      amount
+      currencyCode
+    }
+    product {
+      handle
+      title
+    }
+    selectedOptions {
+      name
+      value
+    }
+    sku
+    title
+    unitPrice {
+      amount
+      currencyCode
+    }
+  }
+`;
