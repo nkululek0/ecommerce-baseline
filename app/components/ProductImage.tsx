@@ -16,7 +16,7 @@ export function ProductImage({
   selectedVariantImage
 }: {
   images: GalleryImage[];
-  selectedVariantImage: ProductVariantFragment['image'];
+  selectedVariantImage?: ProductVariantFragment['image'];
 }) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [modalOpen, setModalOpen] = useState(false);
