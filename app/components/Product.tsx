@@ -1,16 +1,6 @@
-import { useState, useRef } from 'react';
-import {
-  getSelectedProductOptions,
-  Analytics,
-  useOptimisticVariant,
-  getProductOptions,
-  getAdjacentAndFirstAvailableVariants,
-  useSelectedOptionInUrlParam,
-  Money,
-} from '@shopify/hydrogen';
-import { type MappedProductOptions } from '@shopify/hydrogen';
-import { ProductProvider, useProduct, CartProvider, useCart } from '@shopify/hydrogen-react';
-import type { Product, ProductVariant, MoneyV2, CartLineInput } from '@shopify/hydrogen-react/storefront-api-types';
+import { useRef } from 'react';
+import { ProductProvider, useProduct } from '@shopify/hydrogen-react';
+import type { Product, MoneyV2 } from '@shopify/hydrogen-react/storefront-api-types';
 import { ProductPrice } from './ProductPrice';
 import { ProductImage } from './ProductImage';
 import { AddToCartButton } from './AddToCartButton';
@@ -51,7 +41,6 @@ const UsingProduct = () => {
 
   if (!product) return null;
 
-  // const [currentProduct, setCurrentProduct] = useState(product);
   if (!selectedVariant) {
     const variant = variants?.filter((value) => {
       if (value) {
@@ -155,9 +144,15 @@ const UsingProduct = () => {
   );
 };
 
-const ProductOptions = (
-  { option, selectedVariant, setSelectedVariant }:
-  { option: ProductOption, selectedVariant: string, setSelectedVariant: (key: string, value: string) => void }) => {
+type ProductOptionsProps = {
+  option: ProductOption
+  selectedVariant: string
+  setSelectedVariant: (key: string, value: string) => void
+};
+
+const ProductOptions = (props: ProductOptionsProps) => {
+  const { option, selectedVariant, setSelectedVariant } = props;
+
   if (option && option.name && option.values) {
     const { name, values } = option;
 
