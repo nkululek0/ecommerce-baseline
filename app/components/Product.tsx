@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -64,11 +64,11 @@ const UsingProduct = () => {
 
   if (!selectedVariant || !selectedVariant.selectedOptions) return null;
 
-  const selectedVariantOptionsKeys: { [key: string]: string } = {};
+  const selectedVariantOptionsKeys = useRef<{ [key: string]: string }>({});
 
   for (const value of selectedVariant.selectedOptions) {
     if (value?.name && value.value) {
-      selectedVariantOptionsKeys[value.name] = value.value;
+      selectedVariantOptionsKeys.current[value.name] = value.value;
     }
   }
 
@@ -113,7 +113,18 @@ const UsingProduct = () => {
                 <div className="mb-2">
                   {
                     options?.map((option) => (
-                      <ProductOptions option={ option } selectedVariant={ selectedVariantOptionsKeys[option?.name || ""] } />
+                      <ProductOptions
+                        option={ option }
+                        selectedVariant={ selectedVariantOptionsKeys.current[option?.name || ""] }
+                        setSelectedVariant={(key: string, value: string) => {
+                          selectedVariantOptionsKeys.current[key] = value;
+
+                          const variantTitle = Object.values(selectedVariantOptionsKeys.current).join(" / ");
+                          const variant = variants?.filter((value) => value?.title == variantTitle)[0];
+
+                          if (variant) setSelectedVariant(variant);
+                        }}
+                      />
                     ))
                   }
                 </div>
@@ -144,7 +155,9 @@ const UsingProduct = () => {
   );
 };
 
-const ProductOptions = ({ option, selectedVariant }: { option: ProductOption, selectedVariant: string }) => {
+const ProductOptions = (
+  { option, selectedVariant, setSelectedVariant }:
+  { option: ProductOption, selectedVariant: string, setSelectedVariant: (key: string, value: string) => void }) => {
   if (option && option.name && option.values) {
     const { name, values } = option;
 
@@ -157,19 +170,22 @@ const ProductOptions = ({ option, selectedVariant }: { option: ProductOption, se
             <div className="product-options-grid">
               {
                 values.map((value) => {
-                  const selected = value == selectedVariant;
+                  if (value) {
+                    const selected = value == selectedVariant;
 
-                  return (
-                    <p
-                      key={ name + value }
-                      className={`product-options-item border border-solid rounded-md ${ selected ? 'border-brand-gold text-brand-gold text-semibold' : 'border-transparent' }`}
-                      style={{
-                        opacity: true ? 1 : 0.3,
-                      }}
-                    >
-                      { value }
-                    </p>
-                  );
+                    return (
+                      <p
+                        key={ name + value }
+                        className={`product-options-item border border-solid rounded-md cursor-pointer ${ selected ? 'border-brand-gold text-brand-gold text-semibold' : 'border-transparent' }`}
+                        style={{
+                          opacity: true ? 1 : 0.3,
+                        }}
+                        onClick={() => { setSelectedVariant(name, value); }}
+                      >
+                        { value }
+                      </p>
+                    );
+                  }
                 })
               }
             </div>
