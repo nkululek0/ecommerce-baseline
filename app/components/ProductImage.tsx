@@ -1,6 +1,6 @@
 import type {ProductVariantFragment} from 'storefrontapi.generated';
 import {Image} from '@shopify/hydrogen';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Square, X } from 'lucide-react';
 
 type GalleryImage = {
@@ -73,15 +73,17 @@ export function ProductImage({
     return `translate3d(calc(${ diff * 100}% + ${ baseTransform }px), 0, 0)`;
   };
 
+  const defaultBodyOverflowStyle = useRef("");
   const openModal = (index: number) => {
     setModalIndex(index);
     setModalOpen(true);
+    defaultBodyOverflowStyle.current = document.body.style.overflow
     document.body.style.overflow = 'hidden';
   };
 
   const closeModal = () => {
     setModalOpen(false);
-    document.body.style.overflow = '';
+    document.body.style.overflow = defaultBodyOverflowStyle.current;
   };
 
   if (allImages.length <= 0) {
