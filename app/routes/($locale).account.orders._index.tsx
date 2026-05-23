@@ -4,7 +4,7 @@ import {
   useNavigation,
   useSearchParams,
 } from 'react-router';
-import type {Route} from './+types/account.orders._index';
+import type {Route} from './+types/($locale).account.orders._index';
 import {useRef} from 'react';
 import {
   Money,
@@ -63,9 +63,18 @@ export default function Orders() {
   const {orders} = customer;
 
   return (
-    <div className="orders">
-      <OrderSearchForm currentFilters={filters} />
-      <OrdersTable orders={orders} filters={filters} />
+    <div className="bg-brand-cream">
+      <div className="orders container mx-auto px-4 sm:px-6 pt-20 pb-20 md:pt-20 md:pb-20">
+        <h1 className="font-playFair text-brand-navy text-2xl md:text-3xl mb-6">
+          Orders
+        </h1>
+        <div className="p-8 bg-white w-100 rounded-xl">
+          {
+            orders?.nodes.length > 0 && ( <OrderSearchForm currentFilters={filters} /> )
+          }
+          <OrdersTable orders={orders} filters={filters} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -94,7 +103,7 @@ function OrdersTable({
 
 function EmptyOrders({hasFilters = false}: {hasFilters?: boolean}) {
   return (
-    <div>
+    <div className='flex flex-col justify-center items-center'>
       {hasFilters ? (
         <>
           <p>No orders found matching your search.</p>
@@ -108,7 +117,7 @@ function EmptyOrders({hasFilters = false}: {hasFilters?: boolean}) {
           <p>You haven&apos;t placed any orders yet.</p>
           <br />
           <p>
-            <Link to="/collections">Start Shopping →</Link>
+            <Link to="/collections/all">Start Shopping →</Link>
           </p>
         </>
       )}
