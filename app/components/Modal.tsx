@@ -5,11 +5,12 @@ type ModalProps = {
   open: boolean
   closeModal: () => void
   children: React.ReactNode
+  dynamicDimensions?: boolean
 };
 
 
 export function Modal (props: ModalProps) {
-  const { open, closeModal, children } = props;
+  const { open, closeModal, children, dynamicDimensions } = props;
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -36,7 +37,20 @@ export function Modal (props: ModalProps) {
           }}
         >
           <div className="absolute inset-0 bg-black/30" />
-          <div className="absolute top-[5%] left-[5%] h-[90%] w-[90%] overflow-y-scroll p-5 pb-0 bg-white shadow-xl">
+          <div
+            className={ `absolute top-[5%] left-[5%] h-[90%] w-[90%]  p-5 pb-0 bg-white shadow-xl` }
+            style={ dynamicDimensions ? {
+                maxWidth: '638px',
+                width: 'auto',
+                height: `max-content`,
+                margin: 'auto',
+                left: 'calc(25dvw / 4)',
+                right: 'calc(25dvw / 4)',
+                top: 'calc(25dvw / 4)',
+                bottom: 'calc(25dvw / 4)',
+              } : {}
+            }
+          >
             <div className='flex flex-row-reverse'>
               <button className='text-gray-400 hover:text-gray-500 transition-colors duration-300'>
                 <X
