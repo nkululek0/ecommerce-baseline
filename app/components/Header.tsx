@@ -1,5 +1,5 @@
 import {Suspense, useState, useEffect} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router';
+import {Await, NavLink, useAsyncValue, Form} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -8,13 +8,13 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {type Customer, useCustomer} from '~/hooks/useCustomer';
 
 import { Menu, User, Search, ShoppingBag } from 'lucide-react';
 
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
-  isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
 }
 
@@ -22,11 +22,11 @@ type Viewport = 'desktop' | 'mobile';
 
 export function Header({
   header,
-  isLoggedIn,
   cart,
   publicStoreDomain,
 }: HeaderProps) {
   const {shop, menu} = header;
+  const {isLoading, isLoggedIn, customer} = useCustomer();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
@@ -120,7 +120,12 @@ export function Header({
 
             {/* Call To Actions */}
             <div className="flex items-center">
-              <HeaderCtas isLoggedIn={ isLoggedIn } cart={ cart } />
+              <HeaderCtas
+                isLoggedIn={ isLoggedIn }
+                isLoading={ isLoading }
+                customer={ customer }
+                cart={ cart }
+              />
             </div>
           </div>
         </div>
@@ -242,22 +247,71 @@ export function HeaderMenu({
   );
 }
 
+type HeaderCtasProps = {
+  isLoggedIn: boolean;
+  isLoading: boolean;
+  customer: Customer | null;
+  cart: Promise<CartApiQueryFragment | null>;
+};
+
 function HeaderCtas({
   isLoggedIn,
+  isLoading,
+  customer,
   cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+}: HeaderCtasProps) {
   return (
     <>
     <nav className="flex items-center space-x-2 sm:space-x-3 lg:space-x-8" role="navigation">
       <SearchToggle />
-      <NavLink
-        prefetch='intent'
-        to='/account'
-        className='hover:text-brand-gold transition-all-200 p-2 relative after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-brand-gold after:transition-all after:duration-300 hover:after:w-full'
-      >
-        <span className="sr-only">Account</span>
-        <User className='w-5 h-5' />
-      </NavLink>
+      {
+        !isLoading && !isLoggedIn && (
+          <NavLink
+            prefetch='intent'
+            to='/account'
+            className='hover:text-brand-gold transition-all-200 p-2 relative after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-brand-gold after:transition-all after:duration-300 hover:after:w-full'
+          >
+            <span className="sr-only">Account</span>
+            <User className='w-5 h-5' />
+          </NavLink>
+        )
+      }
+      {
+        isLoading && (
+          <span>Checking account…</span>
+        )
+      }
+      {
+        !isLoading && isLoggedIn && customer && (
+          <div className='relative inline-block text-center border border-transparent rounded-[50%] bg-[#F5F5F5] outline outline-[1px] outline-[#00000014] outline-offset-[-1px]'>
+            <p className='w-7 h-5 mb-[25%] cursor-pointer'>
+              {
+                customer.emailAddress && customer.emailAddress.emailAddress && (
+                  `${ customer.emailAddress.emailAddress[0] }`
+                )
+              }
+            </p>
+            <div className='absolute w-max'>
+              <div></div>
+              <ul>
+                <li>
+                  <NavLink
+                    prefetch='intent'
+                    to='/account/profile'
+                  >
+                    Profile
+                  </NavLink>
+                </li>
+                <li>
+                  <Form className="account-logout" method="POST" action="/account/logout">
+                    &nbsp;<button type="submit">Sign out</button>
+                  </Form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )
+      }
       <CartToggle cart={ cart } />
     </nav>
     </>
