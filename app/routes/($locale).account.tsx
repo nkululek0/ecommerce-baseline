@@ -45,11 +45,11 @@ export default function AccountLayout() {
 
   return (
     <div className="account">
-      <h1>{heading}</h1>
+      {/* <h1>{heading}</h1>
       <br />
       <AccountMenu />
       <br />
-      <br />
+      <br /> */}
       <Outlet context={{customer}} />
     </div>
   );

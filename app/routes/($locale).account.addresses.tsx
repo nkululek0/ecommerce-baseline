@@ -11,7 +11,7 @@ import {
   useOutletContext,
   type Fetcher,
 } from 'react-router';
-import type {Route} from './+types/account.addresses';
+import type {Route} from './+types/($locale).account.addresses';
 import {
   UPDATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,
@@ -261,31 +261,33 @@ export default function Addresses() {
   const {defaultAddress, addresses} = customer;
 
   return (
-    <div className="account-addresses">
-      <h2>Addresses</h2>
-      <br />
-      {!addresses.nodes.length ? (
-        <p>You have no addresses saved.</p>
-      ) : (
-        <div>
+    <div className="account-addresses bg-brand-cream">
+      <div className="container mx-auto px-4 sm:px-6 pt-48 pb-20 md:pt-48 md:pb-20">
+        <h2 className='font-playFair text-brand-navy text-2xl md:text-3xl mb-6'>Addresses</h2>
+        <br />
+        {!addresses.nodes.length ? (
+          <>
+          <p>You have no addresses saved.</p>
+          <NewAddressForm />
+          </>
+        ) : (
           <div>
-            <legend>Create address</legend>
             <NewAddressForm />
+            <br />
+            <hr />
+            <br />
+            <ExistingAddresses
+              addresses={addresses}
+              defaultAddress={defaultAddress}
+            />
           </div>
-          <br />
-          <hr />
-          <br />
-          <ExistingAddresses
-            addresses={addresses}
-            defaultAddress={defaultAddress}
-          />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
-function NewAddressForm() {
+export function NewAddressForm() {
   const newAddress = {
     address1: '',
     address2: '',
@@ -301,6 +303,8 @@ function NewAddressForm() {
   } as CustomerAddressInput;
 
   return (
+    <>
+    <legend className='font-playFair text-xl md:text-xl mb-3'>Create address</legend>
     <AddressForm
       addressId={'NEW_ADDRESS_ID'}
       address={newAddress}
@@ -312,12 +316,14 @@ function NewAddressForm() {
             disabled={stateForMethod('POST') !== 'idle'}
             formMethod="POST"
             type="submit"
+            className='h-max w-max px-3 py-1 text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source'
           >
             {stateForMethod('POST') !== 'idle' ? 'Creating' : 'Create'}
           </button>
         </div>
       )}
     </AddressForm>
+    </>
   );
 }
 
@@ -327,7 +333,7 @@ function ExistingAddresses({
 }: Pick<CustomerFragment, 'addresses' | 'defaultAddress'>) {
   return (
     <div>
-      <legend>Existing addresses</legend>
+      <legend className='font-playFair text-xl md:text-xl mb-3'>Existing addresses</legend>
       {addresses.nodes.map((address) => (
         <AddressForm
           key={address.id}
@@ -341,6 +347,7 @@ function ExistingAddresses({
                 disabled={stateForMethod('PUT') !== 'idle'}
                 formMethod="PUT"
                 type="submit"
+                className='h-max w-max px-3 py-1 text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source'
               >
                 {stateForMethod('PUT') !== 'idle' ? 'Saving' : 'Save'}
               </button>
@@ -348,6 +355,7 @@ function ExistingAddresses({
                 disabled={stateForMethod('DELETE') !== 'idle'}
                 formMethod="DELETE"
                 type="submit"
+                className='h-max w-max px-3 py-1 text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source'
               >
                 {stateForMethod('DELETE') !== 'idle' ? 'Deleting' : 'Delete'}
               </button>
@@ -377,10 +385,9 @@ export function AddressForm({
   const error = action?.error?.[addressId];
   const isDefaultAddress = defaultAddress?.id === addressId;
   return (
-    <Form id={addressId}>
+    <Form id={addressId} className='pb-4'>
       <fieldset>
         <input type="hidden" name="addressId" defaultValue={addressId} />
-        <label htmlFor="firstName">First name*</label>
         <input
           aria-label="First name"
           autoComplete="given-name"
@@ -390,8 +397,8 @@ export function AddressForm({
           placeholder="First name"
           required
           type="text"
+          className={` w-full md:w-[48%] md:mr-[4%] mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="lastName">Last name*</label>
         <input
           aria-label="Last name"
           autoComplete="family-name"
@@ -401,8 +408,8 @@ export function AddressForm({
           placeholder="Last name"
           required
           type="text"
+          className={` w-full md:w-[48%] mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="company">Company</label>
         <input
           aria-label="Company"
           autoComplete="organization"
@@ -411,8 +418,8 @@ export function AddressForm({
           name="company"
           placeholder="Company"
           type="text"
+          className={` w-full mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="address1">Address line*</label>
         <input
           aria-label="Address line 1"
           autoComplete="address-line1"
@@ -422,8 +429,8 @@ export function AddressForm({
           placeholder="Address line 1*"
           required
           type="text"
+          className={` w-full mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="address2">Address line 2</label>
         <input
           aria-label="Address line 2"
           autoComplete="address-line2"
@@ -432,8 +439,8 @@ export function AddressForm({
           name="address2"
           placeholder="Address line 2"
           type="text"
+          className={` w-full mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="city">City*</label>
         <input
           aria-label="City"
           autoComplete="address-level2"
@@ -443,8 +450,8 @@ export function AddressForm({
           placeholder="City"
           required
           type="text"
+          className={` w-full md:w-[32%] md:mr-[3%] mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="zoneCode">State / Province*</label>
         <input
           aria-label="State/Province"
           autoComplete="address-level1"
@@ -454,8 +461,8 @@ export function AddressForm({
           placeholder="State / Province"
           required
           type="text"
+          className={` w-full md:w-[37%] md:mr-[3%] mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="zip">Zip / Postal Code*</label>
         <input
           aria-label="Zip"
           autoComplete="postal-code"
@@ -465,8 +472,8 @@ export function AddressForm({
           placeholder="Zip / Postal Code"
           required
           type="text"
+          className={` w-full md:w-[25%] mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="territoryCode">Country Code*</label>
         <input
           aria-label="territoryCode"
           autoComplete="country"
@@ -477,17 +484,18 @@ export function AddressForm({
           required
           type="text"
           maxLength={2}
+          className={` w-full md:w-[48%] md:mr-[4%] mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
-        <label htmlFor="phoneNumber">Phone</label>
         <input
           aria-label="Phone Number"
           autoComplete="tel"
           defaultValue={address?.phoneNumber ?? ''}
           id="phoneNumber"
           name="phoneNumber"
-          placeholder="+16135551111"
+          placeholder="+27 123 456 789"
           pattern="^\+?[1-9]\d{3,14}$"
           type="tel"
+          className={` w-full md:w-[48%] mb-3 p-3 rounded-md border border-[#1A2A3A]/20 focus:border-[#1A2A3A] outline-none transition-colors font-source` }
         />
         <div>
           <input
@@ -495,6 +503,7 @@ export function AddressForm({
             id="defaultAddress"
             name="defaultAddress"
             type="checkbox"
+            className='mr-3'
           />
           <label htmlFor="defaultAddress">Set as default address</label>
         </div>

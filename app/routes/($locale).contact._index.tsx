@@ -1,6 +1,11 @@
 import { Clock, MapPin } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import type { ActionFunctionArgs } from "react-router";
+import type {Route} from './+types/($locale).contact._index';
+
+export const meta: Route.MetaFunction = () => {
+  return [{title: 'Contact'}];
+};
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();

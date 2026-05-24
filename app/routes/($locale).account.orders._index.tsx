@@ -65,9 +65,9 @@ export default function Orders() {
   return (
     <div className="bg-brand-cream">
       <div className="orders container mx-auto px-4 sm:px-6 pt-20 pb-20 md:pt-20 md:pb-20">
-        <h1 className="font-playFair text-brand-navy text-2xl md:text-3xl mb-6">
+        <h2 className="font-playFair text-brand-navy text-2xl md:text-3xl mb-6">
           Orders
-        </h1>
+        </h2>
         <div className="p-8 bg-white w-100 rounded-xl">
           {
             orders?.nodes.length > 0 && ( <OrderSearchForm currentFilters={filters} /> )
