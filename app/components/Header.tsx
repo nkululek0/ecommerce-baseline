@@ -283,7 +283,7 @@ function HeaderCtas({
       }
       {
         !isLoading && isLoggedIn && customer && (
-          <div className='relative inline-block text-center border border-transparent rounded-[50%] bg-[#F5F5F5] outline outline-[1px] outline-[#00000014] outline-offset-[-1px]'>
+          <div className='relative inline-block text-center border border-transparent rounded-[50%] bg-[#F5F5F5] outline outline-[1px] outline-[#00000025] outline-offset-[-1px]'>
             <p className='w-7 h-5 mb-[25%] cursor-pointer'>
               {
                 customer.emailAddress && customer.emailAddress.emailAddress && (
