@@ -6,6 +6,7 @@ type ModalProps = {
   closeModal: () => void
   children: React.ReactNode
   dynamicDimensions?: boolean
+  overflow?: boolean
 };
 
 
@@ -38,11 +39,12 @@ export function Modal (props: ModalProps) {
         >
           <div className="absolute inset-0 bg-black/30" />
           <div
-            className={ `absolute top-[5%] left-[5%] h-[90%] w-[90%]  p-5 pb-0 bg-white shadow-xl` }
+            className={ `absolute top-[5%] left-[5%] h-[90%] w-[90%] overflow-y-auto p-5 pb-0 bg-white shadow-xl` }
             style={ dynamicDimensions ? {
                 maxWidth: '638px',
                 width: 'auto',
-                height: `max-content`,
+                height: 'min-content',
+                maxHeight: '80dvh',
                 margin: 'auto',
                 left: 'calc(25dvw / 4)',
                 right: 'calc(25dvw / 4)',
