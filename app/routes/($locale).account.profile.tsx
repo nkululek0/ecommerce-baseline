@@ -123,7 +123,7 @@ export default function AccountProfile() {
               <p className="text-brand-gold">Add</p>
             </div>
           </div>
-          <div className="">
+          <div className="flex gap-[5rem] flex-wrap">
             {
               customer.addresses.nodes.length == 0 && (
                 <div className='flex items-center gap-3 p-3 rounded-xl bg-[#F5F5F5] border border-transparent outline outline-[1px] outline-[#00000025] outline-offset-[-1px]'>
@@ -147,8 +147,10 @@ export default function AccountProfile() {
                 if (address.id == customer.defaultAddress?.id) {
                   return (
                     <>
-                    <p className="text-brand-navy/60 mb-3">Default address</p>
-                    { addressLayout }
+                    <div>
+                      <p className="text-brand-navy/60 mb-3">Default address</p>
+                      { addressLayout }
+                    </div>
                     </>
                   );
                 }
