@@ -334,35 +334,38 @@ function ExistingAddresses({
   return (
     <div>
       <legend className='font-playFair text-xl md:text-xl mb-3'>Existing addresses</legend>
-      {addresses.nodes.map((address) => (
-        <AddressForm
-          key={address.id}
-          addressId={address.id}
-          address={address}
-          defaultAddress={defaultAddress}
-        >
-          {({stateForMethod}) => (
-            <div>
-              <button
-                disabled={stateForMethod('PUT') !== 'idle'}
-                formMethod="PUT"
-                type="submit"
-                className='h-max w-max px-3 py-1 text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source'
-              >
-                {stateForMethod('PUT') !== 'idle' ? 'Saving' : 'Save'}
-              </button>
-              <button
-                disabled={stateForMethod('DELETE') !== 'idle'}
-                formMethod="DELETE"
-                type="submit"
-                className='h-max w-max px-3 py-1 text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source'
-              >
-                {stateForMethod('DELETE') !== 'idle' ? 'Deleting' : 'Delete'}
-              </button>
-            </div>
-          )}
-        </AddressForm>
-      ))}
+      <div className="flex flex-wrap gap-[3rem]">
+        {addresses.nodes.map((address) => (
+          <AddressForm
+            key={address.id}
+            addressId={address.id}
+            address={address}
+            defaultAddress={defaultAddress}
+            existingAddress={ true }
+          >
+            {({stateForMethod}) => (
+              <div className='flex gap-[2rem] w-fit'>
+                <button
+                  disabled={stateForMethod('PUT') !== 'idle'}
+                  formMethod="PUT"
+                  type="submit"
+                  className='h-max w-max px-3 py-1 text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source'
+                >
+                  {stateForMethod('PUT') !== 'idle' ? 'Saving' : 'Save'}
+                </button>
+                <button
+                  disabled={stateForMethod('DELETE') !== 'idle'}
+                  formMethod="DELETE"
+                  type="submit"
+                  className='h-max w-max px-3 py-1 text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source'
+                >
+                  {stateForMethod('DELETE') !== 'idle' ? 'Deleting' : 'Delete'}
+                </button>
+              </div>
+            )}
+          </AddressForm>
+        ))}
+      </div>
     </div>
   );
 }
@@ -371,11 +374,13 @@ export function AddressForm({
   addressId,
   address,
   defaultAddress,
+  existingAddress,
   children,
 }: {
   addressId: AddressFragment['id'];
   address: CustomerAddressInput;
   defaultAddress: CustomerFragment['defaultAddress'];
+  existingAddress?: boolean;
   children: (props: {
     stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
   }) => React.ReactNode;
@@ -385,7 +390,7 @@ export function AddressForm({
   const error = action?.error?.[addressId];
   const isDefaultAddress = defaultAddress?.id === addressId;
   return (
-    <Form id={addressId} className='pb-4'>
+    <Form id={addressId} className={ `${ existingAddress ? 'w-auto lg:max-w-[350px]' : '' } pb-4` }>
       <fieldset>
         <input type="hidden" name="addressId" defaultValue={addressId} />
         <input
