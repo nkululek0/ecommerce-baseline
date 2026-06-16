@@ -303,6 +303,14 @@ function HeaderCtas({
                   </NavLink>
                 </li>
                 <li>
+                  <NavLink
+                    prefetch='intent'
+                    to='/account/orders'
+                  >
+                    Orders
+                  </NavLink>
+                </li>
+                <li>
                   <Form className="account-logout" method="POST" action="/account/logout">
                     &nbsp;<button type="submit">Sign out</button>
                   </Form>
