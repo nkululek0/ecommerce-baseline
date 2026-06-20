@@ -212,7 +212,45 @@ function OrderItem({order}: {order: OrderItemFragment}) {
   const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status;
   return (
     <>
-      <fieldset>
+      <div className='md:hidden'>
+        <fieldset className='border-solid border-[#00000025] border-[1px] rounded-[4px]'>
+          <div className='border-solid border-[#00000025] border-b-[1px]'>
+            <p className="p-[1rem] bg-[#F5F5F5]">Order</p>
+            <p className='p-[1rem]'>
+              <Link className='block w-100 h-100 underline' to={`/account/orders/${btoa(order.id)}`}>
+                #{order.number}
+              </Link>
+            </p>
+          </div>
+          <div className="border-solid border-[#00000025] border-b-[1px]">
+            <p className="p-[1rem] bg-[#F5F5F5]">Purchase Date</p>
+            <p className='p-[1rem]'>{new Date(order.processedAt).toDateString()}</p>
+          </div>
+          {order.confirmationNumber && (
+            <div className='border-solid border-[#00000025] border-b-[1px]'>
+              <p className="p-[1rem] bg-[#f5f5f5]">Confirmation Code</p>
+              <p className='p-[1rem]'>{order.confirmationNumber}</p>
+            </div>
+          )}
+          <div className="border-solid border-[#00000025] border-b-[1px]">
+            <p className="p-[1rem] bg-[#f5f5f5]">Payment Status</p>
+            <p className='p-[1rem]'>{order.financialStatus}</p>
+          </div>
+          {/* {fulfillmentStatus && <p>{fulfillmentStatus}</p>} */}
+          <div className="border-solid border-[#00000025] border-b-[1px]">
+            <p className="p-[1rem] bg-[#f5f5f5]">Order Total</p>
+            <p className="p-[1rem]">
+              <Money data={order.totalPrice} />
+            </p>
+          </div>
+          <div className="p-[1rem]">
+            <Link className='block w-max p-[0.5rem] text-white bg-brand-gold hover:bg-brand-goldDark transition-colors duration-300 rounded-md font-source' to={`/account/orders/${btoa(order.id)}`}>View Order</Link>
+          </div>
+        </fieldset>
+        <br />
+      </div>
+
+      <fieldset className='md:block hidden'>
         <Link to={`/account/orders/${btoa(order.id)}`}>
           <strong>#{order.number}</strong>
         </Link>
@@ -225,7 +263,6 @@ function OrderItem({order}: {order: OrderItemFragment}) {
         <Money data={order.totalPrice} />
         <Link to={`/account/orders/${btoa(order.id)}`}>View Order →</Link>
       </fieldset>
-      <br />
     </>
   );
 }
