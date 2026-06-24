@@ -97,7 +97,7 @@ export default function OrderRoute() {
               </b>
             </summary>
             <div>
-              <div className="mt-4">
+              <div className="">
                 {lineItems.map((lineItem, lineItemIndex) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <OrderLineRow key={lineItemIndex} lineItem={lineItem} />
@@ -306,7 +306,7 @@ export default function OrderRoute() {
 function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
   return (
     <>
-      <div key={lineItem.id} className='flex items-start justify-between gap-[0.5rem] border-solid border-b-[1px] border-[#00000025] pb-4'>
+      <div key={lineItem.id} className='flex items-start justify-between gap-[0.5rem] border-solid border-b-[1px] border-[#00000025] py-4'>
         {lineItem?.image && (
           <div>
             <Image data={lineItem.image} width={96} height={96} />
@@ -315,7 +315,7 @@ function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
         <div className='flex flex-col'>
           <p className='leading-[18px]'>{lineItem.title}</p>
           <small className='text-[#0000008f]'>{lineItem.variantTitle}</small>
-          <small className='text-[#0000008f]'>Items: {lineItem.quantity}</small>
+          <small className='text-[#0000008f]'>Quantity: {lineItem.quantity}</small>
           {/* <small>
             <Money data={lineItem.totalDiscount!} />
           </small> */}
