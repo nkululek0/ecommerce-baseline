@@ -63,7 +63,7 @@ export default function Homepage() {
   return (
     <div className="home">
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[600px] bg-brand-navy">
+      <section className="relative h-screen min-h-[670px] bg-brand-navy">
         <Image
           data={{
             url: '/images/craftsman-on-sewing-machine.jpg',
