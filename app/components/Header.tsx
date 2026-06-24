@@ -283,40 +283,20 @@ function HeaderCtas({
       }
       {
         !isLoading && isLoggedIn && customer && (
-          <div className='relative inline-block text-center border border-transparent rounded-[50%] bg-[#F5F5F5] outline outline-[1px] outline-[#00000025] outline-offset-[-1px]'>
-            <p className='w-7 h-5 mb-[25%] cursor-pointer'>
-              {
-                customer.emailAddress && customer.emailAddress.emailAddress && (
-                  `${ customer.emailAddress.emailAddress[0] }`
-                )
-              }
-            </p>
-            <div className='absolute w-max'>
-              <div></div>
-              <ul>
-                <li>
-                  <NavLink
-                    prefetch='intent'
-                    to='/account/profile'
-                  >
-                    Profile
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    prefetch='intent'
-                    to='/account/orders'
-                  >
-                    Orders
-                  </NavLink>
-                </li>
-                <li>
-                  <Form className="account-logout" method="POST" action="/account/logout">
-                    &nbsp;<button type="submit">Sign out</button>
-                  </Form>
-                </li>
-              </ul>
-            </div>
+          <div className='relative inline-block text-center border border-transparent rounded-[50%] bg-[#F5F5F5] outline outline-[1px] outline-[#00000025] outline-offset-[-1px] hover:outline-brand-gold hover:text-brand-gold hover:bg-[#fff] transition-all-200'>
+            <NavLink
+              prefetch='intent'
+              to='/account'
+              className='w-full h-full'
+            >
+              <p className='w-7 h-5 mb-[25%] cursor-pointer capitalize'>
+                {
+                  customer.emailAddress && customer.emailAddress.emailAddress && (
+                    `${ customer.emailAddress.emailAddress[0] }`
+                  )
+                }
+              </p>
+            </NavLink>
           </div>
         )
       }
