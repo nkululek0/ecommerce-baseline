@@ -14,12 +14,18 @@ export default function NewsletterForm() {
         <div className="max-w-xl mx-auto text-center">
           <h2 className="font-playFair text-2xl mb-4">Join the Baseline Circle</h2>
           <p className='font-source text-sm text-gray-300 mb-6'>Subscribe to receive updates on new collections and exclusive offers</p>
-          <fetcher.Form method="post" action="/newsletter" replace className="w-full flex flex-wrap justify-center gap-4">
+          <fetcher.Form
+            method="post"
+            action="/newsletter"
+            replace
+            className="w-full flex flex-wrap justify-center gap-4"
+          >
             <input
               type='email'
               placeholder='Your email Address'
               className='flex-1 px-4 py-3 bg-white/10 border-white/20 rounded-md text-white placeholder:text-gray-400 font-source'
               required
+              name='email'
             />
             <button
               type='submit'
