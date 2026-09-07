@@ -1,9 +1,11 @@
 import {useFetcher} from 'react-router';
+import {type Customer, useCustomer} from '~/hooks/useCustomer';
 
 type NewsletterResult = {ok: true} | {ok: false; error: string};
 
 export default function NewsletterForm() {
   const fetcher = useFetcher<NewsletterResult>();
+  const {isLoading, isLoggedIn, customer} = useCustomer();
 
   const isSubmitting = fetcher.state === 'submitting';
   const result = fetcher.data;
@@ -16,7 +18,8 @@ export default function NewsletterForm() {
           <p className='font-source text-sm text-gray-300 mb-6'>Subscribe to receive updates on new collections and exclusive offers</p>
           <fetcher.Form
             method="post"
-            action="/newsletter"
+            // action="/newsletter"
+            action={ (!isLoading && isLoggedIn && customer ) ? '/account/newsletter' : '/newsletter' }
             replace
             className="w-full flex flex-wrap justify-center gap-4"
           >
@@ -41,7 +44,7 @@ export default function NewsletterForm() {
         <p style={{color: 'red'}}>{result.error}</p>
       )}
       {result && result.ok && (
-        <p>Thanks for subscribing!</p>
+        <p>Please accept email subscription invitation!</p>
       )}
     </section>
   );
