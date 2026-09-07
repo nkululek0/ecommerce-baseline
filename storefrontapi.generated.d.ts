@@ -444,6 +444,22 @@ export type RecommendedProductsQuery = {
   };
 };
 
+export type CustomerMarketingUpdateMutationVariables = StorefrontAPI.Exact<{
+  customerAccessToken: StorefrontAPI.Scalars['String']['input'];
+  acceptsMarketing: StorefrontAPI.Scalars['Boolean']['input'];
+}>;
+
+export type CustomerMarketingUpdateMutation = {
+  customerUpdate?: StorefrontAPI.Maybe<{
+    customer?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Customer, 'id' | 'email' | 'acceptsMarketing'>
+    >;
+    customerUserErrors: Array<
+      Pick<StorefrontAPI.CustomerUserError, 'field' | 'message'>
+    >;
+  }>;
+};
+
 export type ArticleQueryVariables = StorefrontAPI.Exact<{
   articleHandle: StorefrontAPI.Scalars['String']['input'];
   blogHandle: StorefrontAPI.Scalars['String']['input'];
@@ -751,6 +767,20 @@ export type CatalogQuery = {
       'hasPreviousPage' | 'hasNextPage' | 'startCursor' | 'endCursor'
     >;
   };
+};
+
+export type NewsletterSubscribeMutationVariables = StorefrontAPI.Exact<{
+  email: StorefrontAPI.Scalars['String']['input'];
+  password: StorefrontAPI.Scalars['String']['input'];
+}>;
+
+export type NewsletterSubscribeMutation = {
+  customerCreate?: StorefrontAPI.Maybe<{
+    customer?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Customer, 'id' | 'email' | 'acceptsMarketing'>
+    >;
+    userErrors: Array<Pick<StorefrontAPI.UserError, 'field' | 'message'>>;
+  }>;
 };
 
 export type PageQueryVariables = StorefrontAPI.Exact<{
@@ -1435,7 +1465,16 @@ interface GeneratedQueryTypes {
   };
 }
 
-interface GeneratedMutationTypes {}
+interface GeneratedMutationTypes {
+  '#graphql\n    mutation CustomerMarketingUpdate(\n      $customerAccessToken: String!\n      $acceptsMarketing: Boolean!\n    ) {\n      customerUpdate(\n        customerAccessToken: $customerAccessToken\n        customer: { acceptsMarketing: $acceptsMarketing }\n      ) {\n        customer {\n          id\n          email\n          acceptsMarketing\n        }\n        customerUserErrors {\n          field\n          message\n        }\n      }\n    }\n  ': {
+    return: CustomerMarketingUpdateMutation;
+    variables: CustomerMarketingUpdateMutationVariables;
+  };
+  '#graphql\n    mutation NewsletterSubscribe($email: String!, $password: String!) {\n      customerCreate(input: {\n        email: $email\n        password: $password\n        acceptsMarketing: true\n      }) {\n        customer { id email acceptsMarketing }\n        userErrors { field message }\n      }\n    }\n  ': {
+    return: NewsletterSubscribeMutation;
+    variables: NewsletterSubscribeMutationVariables;
+  };
+}
 
 declare module '@shopify/hydrogen' {
   interface StorefrontQueries extends GeneratedQueryTypes {}
